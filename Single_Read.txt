@@ -1,0 +1,101 @@
+def singleRead(filename):
+    Lines = []
+    with open(filename, 'r') as f:
+        K_mer = f.readline().rstrip()
+        for line in f:
+            Lines.append(line.rstrip())
+
+    return int(K_mer), Lines
+
+
+k_mer, output = singleRead('SingleReadInput.txt')
+length = len(output)
+line1 = []
+line2 = []
+line3 = ''
+line4 = ''
+i = 0
+o = 0
+while i != length:
+    for j in range(0, k_mer-1):
+        line4 += output[i][j]
+        found1 = 1
+        if found1 and j == k_mer-2:
+            i = i + 1
+            line1.append(line4)
+            line4 = ''
+
+while o != length:
+    for k in range(1, k_mer):
+        line3 += output[o][k]
+        found = 1
+        if found and k == k_mer-1:
+            line2.append(line3)
+            o = o+1
+            line3 = ''
+a_dict = {line1[0]: line2[0]}
+j = 1
+i = line1[0]
+for i in range(1, len(line1)):
+    if line1[i] in a_dict.keys():
+        a_dict[line1[i]] = a_dict[line1[i]] + "," + line2[j]
+    else:
+        a_dict[line1[i]] = line2[j]
+        j += 1
+print("Graph: ")
+for key in a_dict:
+    print(key, '->', a_dict[key])
+for i in a_dict.keys():
+    if i not in a_dict.values():
+        start = i
+print("Start: "+start)
+x = 0
+value = ''
+values = []
+end = ''
+for i in a_dict.values():
+    if "," in i:
+        while x < len(i[x]):
+            if i[x] != ",":
+                value += i[x]
+            else:
+                values.append(value)
+                value = ''
+            x += 1
+        values.append(value)
+        value = ''
+        for v in values:
+            if v not in a_dict.keys():
+                end = v
+    else:
+        if i not in a_dict.keys():
+            end = i
+print("End: "+end)
+Final = ''
+Final += start
+path = ''
+path += start
+values = []
+value = ''
+x = 0
+while start != end:
+    if "," in a_dict[start]:
+        while x < len(a_dict[start]):
+            if a_dict[start][x] != ",":
+                value += a_dict[start][x]
+            else:
+                values.append(value)
+                value = ''
+            x += 1
+        values.append(value)
+        value = ''
+        for i in values:
+            path += i
+            Final += i[len(i)-1]
+        start = values[len(values)-1]
+    else:
+        path += a_dict[start]
+        Final += a_dict[start][len(a_dict[start])-1]
+        start = a_dict[start]
+print("Path: "+path)
+print("Assembled Sequence: "+Final)

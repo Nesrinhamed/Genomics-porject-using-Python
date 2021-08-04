@@ -1,0 +1,130 @@
+def pair_read(filename):
+    Lines = []
+    with open(filename, 'r') as file:
+        L = file.readline().rstrip()
+        K_mer = L.split(" ")
+        for line in file:
+            Lines.append(line.rstrip())
+    return int(K_mer[0]), int(K_mer[1]), Lines
+
+
+k_mer, Gap, output = pair_read('ReadPairsInput.txt')
+key1 = ' '
+key2 = ' '
+value1 = ' '
+value2 = ' '
+i = 0
+list1 = []
+list2 = []
+for i in range(len(output)):
+    for j in range(0, k_mer-1):
+        key1 += output[i][j]
+    list1.append(key1)
+    for j in range(1, k_mer):
+        key2 += output[i][j]
+    list1.append(key2)
+    for j in range(k_mer + 1, len(output[i])-1):
+        value1 += output[i][j]
+    list2.append(value1)
+    for j in range(k_mer + 2, len(output[i])):
+        value2 += output[i][j]
+    list2.append(value2)
+    key1 = ' '
+    key2 = ' '
+    value1 = ' '
+    value2 = ' '
+
+print("Graph:")
+for z in range(0, len(list1), 2):
+    print(list1[z] + "-->" + list1[z+1])
+    print(list2[z] + "   " + list2[z+1])
+print("\n")
+
+distinct1 = []
+distinct2 = []
+val1 = []
+val2 = []
+for x in range(0, len(list1), 2):
+    distinct1.append(list1[x])
+    distinct2.append(list1[x+1])
+    val1.append(list2[x])
+    val2.append(list2[x+1])
+
+start = " "
+start1 = " "
+index = 0
+index1 = 0
+for x in range(len(distinct1)):
+    if distinct1[x] not in distinct2 and val1[x] not in val2:
+        start = distinct1[x]
+        start1 = val1[x]
+        index = x
+        break
+print("Start:", end="")
+print(start)
+print("      "+start1)
+#print("\n")
+end = " "
+end1 = " "
+for x in range(len(distinct2)):
+    if distinct2[x] not in distinct1 and val2[x] not in val1:
+        end = distinct2[x]
+        end1 = val2[x]
+        index1 = x
+        break
+print("End:", end="")
+print(end)
+print("    "+end1)
+#print("\n")
+key_path = []
+value_path = []
+key_path.append(start)
+key_path.append(distinct2[index])
+value_path.append(start1)
+value_path.append(val2[index])
+exit_loop = 0
+while True:
+    for i in range(0, len(distinct1), 1):
+        if distinct1[i] == distinct2[index] and val1[i] == val2[index]:
+            key_path.append(distinct2[i])
+            value_path.append(val2[i])
+            if distinct2[i] == end and val2[i] == end1:
+                exit_loop = 1
+            index = i
+            break
+    if exit_loop == 1:
+        break
+print("Path:")
+for x in range(0, len(key_path), 2):
+    print(key_path[x] + "-->", end="")
+    print(key_path[x+1])
+    print(value_path[x]+"   ", end="")
+    print(value_path[x+1])
+print("\n")
+
+print("Prefix String:")
+prefix = ''
+for x in range(0, len(key_path), 1):
+    if x == len(key_path)-1:
+        prefix += key_path[x]
+    elif x < len(key_path):
+        prefix += key_path[x][1]
+print(prefix)
+#print("\n")
+print("Suffix String:")
+suffix = ''
+for x in range(0, len(value_path), 1):
+    if x == len(value_path)-1:
+        suffix += value_path[x]
+    elif x < len(value_path):
+        suffix += value_path[x][1]
+print(suffix)
+print("\n")
+st = len(suffix) - (k_mer+Gap)
+suf = ''
+for x in range(st-1, len(suffix)):
+    suf += suffix[x]
+assembled = ''
+assembled += (prefix + suf).replace(" ", "")
+print("Assembled Sequecne:")
+print(assembled)
